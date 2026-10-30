@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Activity, ArrowRight, Plus, RefreshCw, Server, Truck, Wifi, WifiOff } from 'lucide-react'
+import { Activity, ArrowRight, Plus, Server, Truck, Wifi, WifiOff } from 'lucide-react'
 import { EmptyState, ErrorState, StatCard } from '@/components/common/display'
 import { FleetMap, type MapPoint } from '@/components/common/fleet-map'
 import { Page, PageHeader } from '@/components/common/page'
@@ -120,18 +120,11 @@ export function DashboardPage() {
         title='Dashboard'
         description={`Live view of every registered tracker. Updates every ${config.refreshIntervalMs / 1000} seconds.`}
         actions={
-          <>
-            <Button variant='outline' onClick={refresh} loading={devices.isFetching}>
-              {!devices.isFetching && <RefreshCw />}
-              Refresh
-              <Kbd id='app.refresh' />
-            </Button>
-            <Button onClick={() => setCreateOpen(true)}>
-              <Plus />
-              Register device
-              <Kbd id='devices.create' inverted />
-            </Button>
-          </>
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus />
+            Register device
+            <Kbd id='devices.create' inverted />
+          </Button>
         }
       />
 

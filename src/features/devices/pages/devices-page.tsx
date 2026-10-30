@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Pencil, Plus, RefreshCw, Search, Trash2, Truck } from 'lucide-react'
+import { Pencil, Plus, Search, Trash2, Truck } from 'lucide-react'
 import { EmptyState, ErrorState } from '@/components/common/display'
 import { Page, PageHeader } from '@/components/common/page'
 import { Pagination } from '@/components/common/pagination'
@@ -67,22 +67,11 @@ export function DevicesPage() {
         title='Devices'
         description='Every tracker that is allowed to send telemetry. A device must be registered here before its messages are stored.'
         actions={
-          <>
-            <Button
-              variant='outline'
-              onClick={() => devices.refetch()}
-              loading={devices.isFetching}
-            >
-              {!devices.isFetching && <RefreshCw />}
-              Refresh
-              <Kbd id='app.refresh' />
-            </Button>
-            <Button onClick={openCreate}>
-              <Plus />
-              Register device
-              <Kbd id='devices.create' inverted />
-            </Button>
-          </>
+          <Button onClick={openCreate}>
+            <Plus />
+            Register device
+            <Kbd id='devices.create' inverted />
+          </Button>
         }
       />
 

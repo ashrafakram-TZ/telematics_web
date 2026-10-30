@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, Plug, RefreshCw, Unplug } from 'lucide-react'
 import { FormField } from '@/components/common/form-field'
 import { useShortcut } from '@/components/shortcuts/shortcut-context'
@@ -13,7 +13,17 @@ import { ConnectionStatusBadge } from './connection-status-badge'
 
 const STORAGE_KEY = 'tz-mqtt-connection'
 
-const randomClientId = () => `tz-web-${Math.random().toString(36).slice(2, 8)}`
+const sessionClientId = () => {
+  try {
+    const existing = sessionStorage.getItem('tz-mqtt-tab-id')
+    if (existing) return existing
+    const id = `tz-web-${Math.random().toString(36).slice(2, 6)}-${Date.now().toString(36).slice(-4)}`
+    sessionStorage.setItem('tz-mqtt-tab-id', id)
+    return id
+  } catch {
+    return `tz-web-${Math.random().toString(36).slice(2, 6)}-${Date.now().toString(36).slice(-4)}`
+  }
+}
 
 const readSaved = (): Partial<ConnectOptions> => {
   try {
@@ -31,9 +41,9 @@ const toBrowserUrl = (value: string) => {
   return `wss://${host}:8884${path ?? '/mqtt'}`.replace(/:8884\/?$/, ':8884/mqtt')
 }
 
-const saveConnection = ({ url, clientId, username }: Omit<ConnectOptions, 'password'>) => {
+const saveConnection = ({ url, username }: Omit<ConnectOptions, 'password' | 'clientId'>) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, clientId, username }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, username }))
     return true
   } catch {
     return false
@@ -49,7 +59,7 @@ interface ConnectionPanelProps {
 export function ConnectionPanel({ status, onConnect, onDisconnect }: ConnectionPanelProps) {
   const [saved] = useState(readSaved)
   const [url, setUrl] = useState(config.mqttUrl)
-  const [clientId, setClientId] = useState(saved.clientId ?? randomClientId)
+  const [clientId, setClientId] = useState(sessionClientId)
   const [username, setUsername] = useState(saved.username ?? '')
   const [password, setPassword] = useState('')
   const [showLogin, setShowLogin] = useState(Boolean(saved.username))
@@ -59,10 +69,12 @@ export function ConnectionPanel({ status, onConnect, onDisconnect }: ConnectionP
     ? undefined
     : 'Use a broker URL such as mqtt://broker.hivemq.com:1883 or wss://host:8884/mqtt'
 
+  const autoConnectedRef = useRef(false)
+
   const toggle = () => {
     if (active) return onDisconnect()
     if (!browserUrl || !clientId.trim()) return
-    saveConnection({ url: url.trim(), clientId: clientId.trim(), username: username.trim() })
+    saveConnection({ url: url.trim(), username: username.trim() })
     const options = {
       url: browserUrl,
       clientId: clientId.trim(),
@@ -71,6 +83,18 @@ export function ConnectionPanel({ status, onConnect, onDisconnect }: ConnectionP
     }
     onConnect(options)
   }
+
+  useEffect(() => {
+    if (!autoConnectedRef.current && browserUrl && clientId.trim()) {
+      autoConnectedRef.current = true
+      onConnect({
+        url: browserUrl,
+        clientId: clientId.trim(),
+        username: username.trim(),
+        password,
+      })
+    }
+  }, [browserUrl, clientId, username, password, onConnect])
 
   useShortcut('console.connect', toggle)
 
@@ -132,7 +156,10 @@ export function ConnectionPanel({ status, onConnect, onDisconnect }: ConnectionP
               <Button
                 variant='outline'
                 size='icon'
-                onClick={() => setClientId(randomClientId())}
+                onClick={() => {
+                  sessionStorage.removeItem('tz-mqtt-tab-id')
+                  setClientId(sessionClientId())
+                }}
                 disabled={active}
                 aria-label='Generate a new client ID'
                 title='Generate a new client ID'

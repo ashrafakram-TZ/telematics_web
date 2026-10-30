@@ -8,7 +8,6 @@ import {
   History,
   KeyRound,
   Pencil,
-  RefreshCw,
   Route,
   SearchX,
   Trash2,
@@ -18,7 +17,6 @@ import { FleetMap } from '@/components/common/fleet-map'
 import { Page, PageHeader } from '@/components/common/page'
 import { Pagination } from '@/components/common/pagination'
 import { useShortcut } from '@/components/shortcuts/shortcut-context'
-import { Kbd } from '@/components/shortcuts/kbd'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -138,11 +136,6 @@ export function DeviceDetailPage() {
           }
           actions={
             <>
-              <Button variant='outline' onClick={refresh} aria-label='Refresh'>
-                <RefreshCw />
-                <span className='hidden sm:inline'>Refresh</span>
-                <Kbd id='app.refresh' />
-              </Button>
               <Button variant='outline' onClick={() => setEditOpen(true)}>
                 <Pencil />
                 Edit

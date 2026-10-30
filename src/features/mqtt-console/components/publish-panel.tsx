@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Send, TriangleAlert, Wand2 } from 'lucide-react'
+import { Send, Wand2 } from 'lucide-react'
 import { FormField } from '@/components/common/form-field'
 import { SegmentedControl } from '@/components/common/segmented-control'
 import { useShortcut } from '@/components/shortcuts/shortcut-context'
@@ -127,16 +127,9 @@ export function PublishPanel({ status, onPublish }: PublishPanelProps) {
           />
         </FormField>
         <div className='-mt-2 flex items-center justify-between gap-2'>
-          {jsonValid ? (
-            <span className='text-xs text-muted-foreground'>
-              {looksJson ? 'Valid JSON' : 'Plain text'}
-            </span>
-          ) : (
-            <span className='flex items-center gap-1 text-xs font-medium text-warning'>
-              <TriangleAlert className='size-3.5' />
-              Not valid JSON. The API will reject it.
-            </span>
-          )}
+          <span className='text-xs text-muted-foreground'>
+            {jsonValid && looksJson ? 'JSON' : 'Plain text'}
+          </span>
           <Button variant='ghost' size='sm' onClick={formatJson}>
             <Wand2 />
             Format

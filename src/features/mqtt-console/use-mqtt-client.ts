@@ -116,8 +116,10 @@ export function useMqttClient(initialSubscriptions: Omit<Subscription, 'color'>[
         password: options.password || undefined,
         protocolVersion: 4,
         clean: true,
-        reconnectPeriod: 4000,
-        connectTimeout: 10_000,
+        reconnectPeriod: 1000,
+        connectTimeout: 5000,
+        keepalive: 60,
+        reschedulePings: true,
       })
       clientRef.current = client
       const current = () => clientRef.current === client
